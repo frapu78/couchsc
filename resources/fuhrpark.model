@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<model xmlns="http://frapu.net/xsd/ProcessEditor" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="1460050154" name="Fuhrpark" type="net.frapu.code.visualization.domainModel.DomainModel" xsi:schemaLocation="http://frapu.net/xsd/ProcessEditor http://frapu.net/xsd/ProcessEditor.xsd">
+<nodes>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="Fuhrpark"/>
+<property name="#attributes" value=""/>
+<property name="color_background" value="-817661"/>
+<property name="width" value="100"/>
+<property name="#id" value="2012664547"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value="root_instance"/>
+<property name="shadow" value="0"/>
+<property name="y" value="154"/>
+<property name="key" value=""/>
+<property name="x" value="369"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="Mitarbeiter"/>
+<property name="#attributes" value="{0}+Geburtsdatum:Date;{1}+Vorname:String;{2}+Nachname:String"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="114"/>
+<property name="#id" value="1957451631"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="279"/>
+<property name="key" value="doc.Vorname+&quot; &quot;+doc.Nachname"/>
+<property name="x" value="536"/>
+</node>
+<node>
+<property name="abstract" value="1"/>
+<property name="text" value="Fahrzeug"/>
+<property name="#attributes" value="{0}+Erstzulassung:Date;{1}+Kennzeichen:String;{2}+Typ:String = BMW"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="114"/>
+<property name="#id" value="596228541"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="279"/>
+<property name="key" value="doc.Kennzeichen+&quot; (&quot;+doc.Typ+&quot;)&quot;"/>
+<property name="x" value="225"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="Vertraege"/>
+<property name="#attributes" value="{0}+Enddatum:Date;{1}+Startdatum:Date;{2}+newAttribute:String"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="100"/>
+<property name="#id" value="1645877562"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="75"/>
+<property name="key" value=""/>
+<property name="x" value="188"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="ExternerMitarbeiter"/>
+<property name="#attributes" value="{0}+Firma:String"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="131"/>
+<property name="#id" value="1600112134"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="81"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="410"/>
+<property name="key" value="doc.Vorname+&quot; &quot;+doc.Nachname+&quot; (&quot;+doc.Firma+&quot;)&quot;"/>
+<property name="x" value="536"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="Motorrad"/>
+<property name="#attributes" value="{0}+Beiwagen:Boolean = false"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="100"/>
+<property name="#id" value="449818911"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="401"/>
+<property name="key" value=""/>
+<property name="x" value="87"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="PKW"/>
+<property name="#attributes" value="{0}+Sitzplaetze:Integer = 5"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="100"/>
+<property name="#id" value="1115916110"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="401"/>
+<property name="key" value=""/>
+<property name="x" value="225"/>
+</node>
+<node>
+<property name="abstract" value="0"/>
+<property name="text" value="LKW"/>
+<property name="#attributes" value="{0}+Laenge:String;{1}+Nutzlast:String"/>
+<property name="color_background" value="-5321155"/>
+<property name="width" value="100"/>
+<property name="#id" value="930458854"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.DomainClass"/>
+<property name="height" value="80"/>
+<property name="stereotype" value=""/>
+<property name="shadow" value="0"/>
+<property name="y" value="401"/>
+<property name="key" value=""/>
+<property name="x" value="369"/>
+</node>
+</nodes>
+<edges>
+<edge>
+<property name="sourceMultiplicity" value="1..*"/>
+<property name="color_arc" value="-8882056"/>
+<property name="direction" value="NONE"/>
+<property name="targetMultiplicity" value="1..*"/>
+<property name="label" value=""/>
+<property name="sourceVisibility" value=""/>
+<property name="targetName" value=""/>
+<property name="#id" value="1587573824"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Aggregation"/>
+<property name="sourceName" value=""/>
+<property name="targetVisibility" value=""/>
+<property name="#sourceNode" value="2012664547"/>
+<property name="composition" value="0"/>
+<property name="points" value="529,154"/>
+<property name="#targetNode" value="1957451631"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="-7,-40"/>
+</edge>
+<edge>
+<property name="sourceMultiplicity" value="1..*"/>
+<property name="color_arc" value="-8882056"/>
+<property name="direction" value="NONE"/>
+<property name="targetMultiplicity" value="1..*"/>
+<property name="label" value=""/>
+<property name="sourceVisibility" value=""/>
+<property name="targetName" value=""/>
+<property name="#id" value="654391685"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Aggregation"/>
+<property name="sourceName" value=""/>
+<property name="targetVisibility" value=""/>
+<property name="#sourceNode" value="2012664547"/>
+<property name="composition" value="0"/>
+<property name="points" value="236,154"/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="11,-40"/>
+</edge>
+<edge>
+<property name="sourceMultiplicity" value="1..*"/>
+<property name="color_arc" value="-8882056"/>
+<property name="direction" value="TARGET"/>
+<property name="targetMultiplicity" value="1..*"/>
+<property name="label" value="dienstwagen"/>
+<property name="sourceVisibility" value=""/>
+<property name="targetName" value=""/>
+<property name="#id" value="1852276386"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Association"/>
+<property name="sourceName" value=""/>
+<property name="targetVisibility" value=""/>
+<property name="#sourceNode" value="1957451631"/>
+<property name="composition" value="0"/>
+<property name="points" value=""/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value="-57,2"/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="56,2"/>
+</edge>
+<edge>
+<property name="sourceMultiplicity" value="1..*"/>
+<property name="color_arc" value="-8882056"/>
+<property name="direction" value="NONE"/>
+<property name="targetMultiplicity" value="1..*"/>
+<property name="label" value=""/>
+<property name="sourceVisibility" value=""/>
+<property name="targetName" value=""/>
+<property name="#id" value="1175998359"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Aggregation"/>
+<property name="sourceName" value=""/>
+<property name="targetVisibility" value=""/>
+<property name="#sourceNode" value="2012664547"/>
+<property name="composition" value="0"/>
+<property name="points" value="369,75"/>
+<property name="#targetNode" value="1645877562"/>
+<property name="#source_dockpoint" value="0,-40"/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value=""/>
+</edge>
+<edge>
+<property name="sourceMultiplicity" value="1..*"/>
+<property name="color_arc" value="-8882056"/>
+<property name="direction" value="TARGET"/>
+<property name="targetMultiplicity" value="1..*"/>
+<property name="label" value=""/>
+<property name="sourceVisibility" value=""/>
+<property name="targetName" value=""/>
+<property name="#id" value="816737906"/>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Association"/>
+<property name="sourceName" value=""/>
+<property name="targetVisibility" value=""/>
+<property name="#sourceNode" value="1645877562"/>
+<property name="composition" value="0"/>
+<property name="points" value=""/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="-37,-40"/>
+</edge>
+<edge>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Inheritance"/>
+<property name="#id" value="1885054222"/>
+<property name="color_arc" value="-8882056"/>
+<property name="#sourceNode" value="1600112134"/>
+<property name="composition" value="0"/>
+<property name="label" value=""/>
+<property name="points" value=""/>
+<property name="#targetNode" value="1957451631"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value=""/>
+</edge>
+<edge>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Inheritance"/>
+<property name="#id" value="1119294490"/>
+<property name="color_arc" value="-8882056"/>
+<property name="#sourceNode" value="449818911"/>
+<property name="composition" value="0"/>
+<property name="label" value=""/>
+<property name="points" value="87,342+225,342"/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="0,39"/>
+</edge>
+<edge>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Inheritance"/>
+<property name="#id" value="1005639669"/>
+<property name="color_arc" value="-8882056"/>
+<property name="#sourceNode" value="1115916110"/>
+<property name="composition" value="0"/>
+<property name="label" value=""/>
+<property name="points" value=""/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value=""/>
+</edge>
+<edge>
+<property name="#type" value="net.frapu.code.visualization.domainModel.Inheritance"/>
+<property name="#id" value="1160800030"/>
+<property name="color_arc" value="-8882056"/>
+<property name="#sourceNode" value="930458854"/>
+<property name="composition" value="0"/>
+<property name="label" value=""/>
+<property name="points" value="369,342+225,342"/>
+<property name="#targetNode" value="596228541"/>
+<property name="#source_dockpoint" value=""/>
+<property name="#label_offset" value="0.5"/>
+<property name="#target_dockpoint" value="0,39"/>
+</edge>
+</edges>
+<properties>
+<property name="author" value="Dr Frank Puhlmann"/>
+<property name="#source" value=""/>
+<property name="#creationDate" value="1. Dezember 2010 21:28:30 MEZ"/>
+<property name="name" value="Fuhrpark"/>
+<property name="namespacePrefix" value=""/>
+<property name="namespaceUri" value=""/>
+<property name="#data" value=""/>
+<property name="#uri" value="/models/tmp/1520138062_8870594007212892886"/>
+<property name="comment" value=""/>
+</properties>
+</model>

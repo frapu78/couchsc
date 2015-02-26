@@ -1,0 +1,1 @@
+Please add the processeditor.jar file here and add it to the project (sources at https://github.com/frapu78/processeditor)
