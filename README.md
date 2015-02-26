@@ -16,8 +16,10 @@ CouchSC puts a domain model based REST-wrapper around CouchDB for simple persist
 5. Import resources/fuhrpark.model.
 
 ## Running it!
-6. Open the imported model "Fuhrpark" and copy the URL, e.g. http://localhost:1205/models/1520138062 - Last id will be different!
-7. Open the CouchSCServer class and configure the modelLocation variable accordingly to the copied URL (as a source for the model to be used).
-8. Point your browser to http://localhost:2107 and relax!
+6. Create a project in an IDE of your choice, add the content of this repository as well as the processeditor.jar file.
+7. Open the imported model "Fuhrpark" in the WebModeler and copy the URL, e.g. http://localhost:1205/models/1520138062 - Last id will be different!
+8. Open the CouchSCServer source and configure the modelLocation variable accordingly to the copied URL (as a source for the model to be used).
+9. Run the CouchSCServer.
+10. Point your browser to http://localhost:2107 and relax!
 
 
