@@ -20,6 +20,7 @@ import net.frapu.code.visualization.domainModel.Attribute;
 import net.frapu.code.visualization.domainModel.DomainClass;
 import net.frapu.code.visualization.domainModel.DomainModel;
 import net.frapu.code.visualization.domainModel.DomainUtils;
+import net.frapu.couchsc.utils.CouchDBHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,17 +37,21 @@ public class CouchSCServer {
     private boolean running = false;
     private DomainModel model;
     private InstanceConnector ic = null;
-    private final String couchDB = "http://localhost:5984/";
     private String couchDBVersion = "";
     private static final int port = 2107;
+
     private final URI modelLocation = URI.create(("http://localhost:1205/models/1520138062"));
+    // Credentials for CouchDB
+    private final String couchDBUrl = "http://localhost:5984/";
+    private final String couchDBCredentials = CouchDBHelper.getBasicAuthString("admin", "admin");
+    // Credentials for ProcessEditorServer
     private final UserCredentials modelUserCredentials = new UserCredentials("http://localhost:1205", "root", "inubit");
 
-    public CouchSCServer() {
+    public CouchSCServer() throws Exception {
     }
 
     public void start() {
-        System.out.println("Server started...");
+        System.out.println("Server started at "+server.getAddress()+"...");
         if (this.server != null) {
             this.server.start();
         }
@@ -187,11 +192,12 @@ public class CouchSCServer {
         model = (DomainModel) ProcessUtils.parseProcessModelSerialization(modelLocation,
                 modelUserCredentials);
         // Connect to CouchDB and get version (just a check)
-        JSONHttpRequest req = new JSONHttpRequest(URI.create(couchDB));
+        JSONHttpRequest req = new JSONHttpRequest(URI.create(couchDBUrl));
+        req.setRequestProperty("Authorization", couchDBCredentials);
         JSONObject obj = req.executeGetRequest();
         couchDBVersion = obj.optString("version");
         // Establish instance connector
-        ic = new InstanceConnector(model, couchDB);
+        ic = new InstanceConnector(model, couchDBUrl, couchDBCredentials);
         // Create default entry
 
         /*
@@ -227,7 +233,7 @@ public class CouchSCServer {
     }
 
     public String getCouchDB() {
-        return couchDB;
+        return couchDBUrl;
     }
 
     public String getCouchDBVersion() {
@@ -236,7 +242,11 @@ public class CouchSCServer {
 
     public static CouchSCServer getInstance() {
         if (instance == null) {
-            instance = new CouchSCServer();
+            try {
+                instance = new CouchSCServer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return instance;
     }

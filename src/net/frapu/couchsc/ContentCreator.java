@@ -8,6 +8,7 @@ import com.inubit.research.client.JSONHttpRequest;
 import java.io.FileInputStream;
 import net.frapu.code.visualization.ProcessUtils;
 import net.frapu.code.visualization.domainModel.DomainModel;
+import net.frapu.couchsc.utils.CouchDBHelper;
 import org.json.JSONObject;
 
 /**
@@ -24,7 +25,7 @@ public class ContentCreator {
         DomainModel model = (DomainModel) ProcessUtils.parseProcessModelSerialization(
                 new FileInputStream("resources/buchladen.model"));
 
-        InstanceConnector ic = new InstanceConnector(model, "http://localhost:5984/");
+        InstanceConnector ic = new InstanceConnector(model, "http://localhost:5984/", CouchDBHelper.getBasicAuthString("admin","admin"));
 
         // Erzeuge 1000 Autoren
         long startTime = System.currentTimeMillis();

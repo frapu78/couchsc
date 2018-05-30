@@ -1,0 +1,4 @@
+2018-05-30
+ * Updated support for newer couchdb versions with basic authentication
+ * Introduced support for enumerations via EnumerationClasses and drop-down boxes
+ * Started implementation of DefaultRenderer for plain HTML output

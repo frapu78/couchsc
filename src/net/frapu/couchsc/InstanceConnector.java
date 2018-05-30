@@ -23,12 +23,14 @@ public class InstanceConnector {
     public static String VALIDCHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     private DomainModel model;
     private String server;
+    private String credentials;
     private String dbName;
     private URI dbUri;
 
-    public InstanceConnector(DomainModel model, String server) throws Exception {
+    public InstanceConnector(DomainModel model, String server, String credentials) throws Exception {
         this.model = model;
         this.server = server;
+        this.credentials = credentials;
         if (!server.endsWith("/")) {
             server += "/";
         }
@@ -39,6 +41,7 @@ public class InstanceConnector {
         dbUri = URI.create(server + dbName);
         JSONHttpRequest req = new JSONHttpRequest(dbUri);
         try {
+            req.setRequestProperty("Authorization", credentials);
             req.executePutRequest(null);
         } catch (IOException e) {
             if (req.getLastStatus() != 412) {
@@ -77,6 +80,7 @@ public class InstanceConnector {
             IOException, ParserConfigurationException, JSONException {
         URI uri = URI.create(server + dbName+"/_design/view_"+dbName+"/_view/"+viewname);
         JSONHttpRequest req = new JSONHttpRequest(uri);
+        req.setRequestProperty("Authorization", credentials);
         return req.executeGetRequest();
     }
 
@@ -90,12 +94,14 @@ public class InstanceConnector {
                 "/"+dbName+"/_design/assoc_"+dbName+"/_view/AssociationsFrom","key=\""+docname+"\"",
                 null );
         JSONHttpRequest req = new JSONHttpRequest(uri);
+        req.setRequestProperty("Authorization", credentials);
         return req.executeGetRequest();
     }
 
     public JSONObject getDocument(String id) throws
             JSONException, MalformedURLException, IOException, ParserConfigurationException {
         JSONHttpRequest req = new JSONHttpRequest(URI.create(server + dbName+"/"+id));
+        req.setRequestProperty("Authorization", credentials);
         return req.executeGetRequest();
     }
 
@@ -110,6 +116,7 @@ public class InstanceConnector {
         }
         // PUT
         JSONHttpRequest req = new JSONHttpRequest(URI.create(server + dbName + "/" + doc.get("_id")));
+        req.setRequestProperty("Authorization", credentials);
         return req.executePutRequest(doc);
 
     }

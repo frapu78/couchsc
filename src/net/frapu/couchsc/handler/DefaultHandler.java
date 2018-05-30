@@ -20,6 +20,7 @@ import net.frapu.code.visualization.domainModel.Association;
 import net.frapu.code.visualization.domainModel.Attribute;
 import net.frapu.code.visualization.domainModel.DomainClass;
 import net.frapu.code.visualization.domainModel.DomainUtils;
+import net.frapu.couchsc.renderer.DefaultRenderer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,14 @@ import org.json.JSONObject;
  * @author frank
  */
 public class DefaultHandler implements HttpHandler {
+
+    private DefaultRenderer renderer;
+
+    public DefaultHandler() {
+        // Get default renderer
+        CouchSCServer cscs = CouchSCServer.getInstance();
+        renderer = new DefaultRenderer(cscs.getDomainModel());
+    }
 
     public void handle(HttpExchange he) throws IOException {
 
@@ -198,25 +207,22 @@ public class DefaultHandler implements HttpHandler {
                 } else {
                     try {
                         response += "<img src=\"" + cscs.getRecentModelLocation().toString() + "/nodes/" + typeClass.getId() + ".png?" + UserRequestHandler.SESSION_ATTRIBUTE + "=" + cscs.getRecentUserCredentials().getSessionId() + "\" align=\"right\">";
+                        response += "<h2>Create new instance of " + typeClass.getName() + "</h2>";
+                        response += "<form action=\"/types/" + requestedType + "\" method=\"post\" enctype=\"multipart/form-data\">";
+                        response += "<table>";
+                        response += "<tr style=\"background-color:#eeeeee\"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
+                        List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
+                        for (DomainClass dc : dcs) {
+                            for (Attribute a : dc.getAttributesByIDs().values()) {
+                                response += renderer.renderAttribute(a, null);
+                            }
+                        }
+                        response += "</table>";
+                        response += "<input class=\"button\" value=\"Create\" type=\"submit\"/>";
+                        response += "<input class=\"button\" value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
+                        response += "</form>";
                     } catch (Exception ex) {
                     }
-                    response += "<h2>Create new instance of " + typeClass.getName() + "</h2>";
-                    response += "<form action=\"/types/" + requestedType + "\" method=\"post\" enctype=\"multipart/form-data\">";
-                    response += "<table>";
-                    response += "<tr style=\"background-color:#eeeeee\"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
-                    List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
-                    for (DomainClass dc : dcs) {
-                        for (Attribute a : dc.getAttributesByIDs().values()) {
-                            response += "<tr><td>" + a.getName() + (a.getMultiplicity().startsWith("1") ? "*" : "") + "</td>";
-                            response += "<td>" + a.getType() + "</td>";
-                            response += "<td><input type=\"text\" value=\"" + a.getDefault() + "\" size=\"40\" name=\"" + InstanceConnector.normalize(a.getName()) + "\"/>";
-                            response += (a.getMultiplicity().endsWith("*") ? "[+]" : "") + "</td></tr>";
-                        }
-                    }
-                    response += "</table>";
-                    response += "<input class=\"button\" value=\"Create\" type=\"submit\"/>";
-                    response += "<input class=\"button\" value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
-                    response += "</form>";
                 }
             }
         } else if (requestUri.matches("/data/.*")) {
@@ -257,14 +263,7 @@ public class DefaultHandler implements HttpHandler {
                             List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
                             for (DomainClass dc : dcs) {
                                 for (Attribute a : dc.getAttributesByIDs().values()) {
-                                    response += "<tr><td>" + a.getName() + (a.getMultiplicity().startsWith("1") ? "*" : "") + "</td>";
-                                    response += "<td>" + a.getType() + "</td>";
-                                    String value = "";
-                                    if (doc.has(a.getName())) {
-                                        value = doc.getString(a.getName());
-                                    }
-                                    response += "<td><input type=\"text\" value=\"" + value + "\" size=\"40\" name=\"" + InstanceConnector.normalize(a.getName()) + "\"/>";
-                                    response += (a.getMultiplicity().endsWith("*") ? "[+]" : "") + "</td></tr>";
+                                    response += renderer.renderAttribute(a, doc);
                                 }
                             }
                             response += "</table>";
@@ -330,7 +329,7 @@ public class DefaultHandler implements HttpHandler {
                     response += "<ul>";
                     for (int pos = 0; pos < rows.length(); pos++) {
                         JSONObject value = rows.getJSONObject(pos).getJSONObject("value");
-                        if (value.getString("label").equals(name)) {
+                        /*if (value.getString("label").equals(name))*/ {
                             response += "<li><a href=\"/data/" + value.getString("target") + "\">" + value.getString("target") + "</a></li>";
                         }
                         //                                            response += "<tr><td>" + value.getString("label");
