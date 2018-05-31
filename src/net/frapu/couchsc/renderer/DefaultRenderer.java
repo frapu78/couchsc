@@ -60,8 +60,12 @@ public class DefaultRenderer {
             }
         // Check different types, start with a check if the type is an enumeration in the model
         List<ProcessNode> enums = recentModel.getNodesByClass(EnumerationClass.class);
+
+        //
+        // Check for Enumeration
+        //
         for (ProcessNode node: enums) {
-            if (node.getName().equals(a.getType())) {
+            if (node.getName().equalsIgnoreCase(a.getType())) {
                 //
                 // Found enumeration, render as drop-down
                 //
@@ -79,11 +83,16 @@ public class DefaultRenderer {
                 return response;
             }
         }
-
-        //
-        // Default rendering as text field (String)
-        //
-        response += "<td><input type=\"text\" value=\"" + value + "\" size=\"40\" name=\"" + InstanceConnector.normalize(a.getName()) + "\"/>";
+        // Check for DatePicker
+        if (a.getType().equalsIgnoreCase(Attribute.TYPE_DATE)) {
+            response += "<td><input type=\"text\" id=\"datepicker\" value=\"" + value + "\" size=\"40\" name=\"" + InstanceConnector.normalize(a.getName()) + "\"/>";
+        } else {
+            //
+            // Default rendering as text field (String)
+            //
+            response += "<td><input type=\"text\" value=\"" + value + "\" size=\"40\" name=\"" + InstanceConnector.normalize(a.getName()) + "\"/>";
+        }
+        // Check for multi instance (@todo: Implement support for multi instance!
         response += (a.getMultiplicity().endsWith("*") ? "[+]" : "") + "</td></tr>";
 
         return response;

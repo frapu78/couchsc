@@ -209,17 +209,18 @@ public class DefaultHandler implements HttpHandler {
                         response += "<img src=\"" + cscs.getRecentModelLocation().toString() + "/nodes/" + typeClass.getId() + ".png?" + UserRequestHandler.SESSION_ATTRIBUTE + "=" + cscs.getRecentUserCredentials().getSessionId() + "\" align=\"right\">";
                         response += "<h2>Create new instance of " + typeClass.getName() + "</h2>";
                         response += "<form action=\"/types/" + requestedType + "\" method=\"post\" enctype=\"multipart/form-data\">";
-                        response += "<table>";
-                        response += "<tr style=\"background-color:#eeeeee\"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
+                        response += "<div id=\"data-edit\" class=\"ui-widget\">";
+                        response += "<table class=\"ui-widget ui-widget-content\">";
+                        response += "<tr class=\"ui-widget-header\"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
                         List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
                         for (DomainClass dc : dcs) {
                             for (Attribute a : dc.getAttributesByIDs().values()) {
                                 response += renderer.renderAttribute(a, null);
                             }
                         }
-                        response += "</table>";
-                        response += "<input class=\"button\" value=\"Create\" type=\"submit\"/>";
-                        response += "<input class=\"button\" value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
+                        response += "</table></div>";
+                        response += "<input class=\"ui-button ui-widget ui-corner-all\" value=\"Create\" type=\"submit\"/>";
+                        response += "<input class=\"ui-button ui-widget ui-corner-all\"  value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
                         response += "</form>";
                     } catch (Exception ex) {
                     }
@@ -258,19 +259,20 @@ public class DefaultHandler implements HttpHandler {
                             response += "<img src=\"" + cscs.getRecentModelLocation().toString() + "/nodes/" + typeClass.getId() + ".png?" + UserRequestHandler.SESSION_ATTRIBUTE + "=" + cscs.getRecentUserCredentials().getSessionId() + "\" align=\"right\">";
                             response += "<h2>Edit instance of " + typeClass.getName() + " (" + doc.getString("_id") + ")</h2>";
                             response += "<form action=\"/data/" + doc.getString("_id") + "\" method=\"post\" enctype=\"multipart/form-data\">";
-                            response += "<table>";
-                            response += "<tr style=\"background-color:#eeeeee\"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
+                            response += "<div  id=\"data-edit\" class=\"ui-widget\">";
+                            response += "<table class=\"ui-widget ui-widget-content\">";
+                            response += "<tr class=\"ui-widget-header \"><td>Attribute</td><td>Type</td><td>Value</td></tr>";
                             List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
                             for (DomainClass dc : dcs) {
                                 for (Attribute a : dc.getAttributesByIDs().values()) {
                                     response += renderer.renderAttribute(a, doc);
                                 }
                             }
-                            response += "</table>";
+                            response += "</table></div>";
                             response = renderAssociations(typeClass, cscs, response, assocs);
 
-                            response += "<input class=\"button\" value=\"Update\" type=\"submit\"/>";
-                            response += "<input class=\"button\" value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
+                            response += "<input class=\"ui-button ui-widget ui-corner-all\"  value=\"Update\" type=\"submit\"/>";
+                            response += "<input class=\"ui-button ui-widget ui-corner-all\"  value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
                             response += "</form>";
                         }
                     } else {
@@ -417,8 +419,33 @@ public class DefaultHandler implements HttpHandler {
 
     private String renderHeader(String response, CouchSCServer cscs) {
         // HEADER
-        response = "<html><head><title>CouchSC Server</title></head><body>\n";
-        response += "<table border='0' width='100%'><tr>";
+        response = "<html><head><title>CouchSC Server</title>";
+        // Include JQueryUI, see https://jqueryui.com
+        response += "<link rel=\"stylesheet\" href=\"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css\">" +
+                    " <link rel=\"stylesheet\" href=\"/resources/demos/style.css\">" +
+                    " <script src=\"https://code.jquery.com/jquery-1.12.4.js\"></script>" +
+                    " <script src=\"https://code.jquery.com/ui/1.12.1/jquery-ui.js\"></script>";
+        response += "<style>" +
+                    "    label, input { display:block; }" +
+                    "    input.text { margin-bottom:12px; width:95%; padding: .4em; }" +
+                    "    fieldset { padding:0; border:0; margin-top:25px; }" +
+                    "    h1 { font-size: 1.2em; margin: .6em 0; }" +
+                    "    div#data-edit { width: 350px; margin: 20px 0; }" +
+                    "    div#data-edit table { margin: 1em 0; border-collapse: collapse; width: 100%; }" +
+                    "    div#data-edit table td, div#data-edit table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }" +
+                    "    .ui-dialog .ui-state-error { padding: .3em; }" +
+                    "    .validateTips { border: 1px solid transparent; padding: 0.3em; }" +
+                    "  </style>";
+        response += "  <script>" +
+                    "  $( function() {" +
+                    "    $( \"#datepicker\" ).datepicker({" +
+                    "       changeMonth: true," +
+                    "      changeYear: true" +
+                    "    });" +
+                    "  } );" +
+                    "  </script>";
+        response += "</head><body>\n";
+        response += "<table border=\"0\" width='100%'><tr>";
         response += "<td><h1><a href=\"/\">CouchSC Server</a></h1></td>";
         response += "<td valign='top' align='right'>";
         response += "<p>CouchDB: " + cscs.getCouchDBVersion() + " (" + cscs.getCouchDB() + cscs.getInstanceConnector().getDbName() + ")" + "<br>";

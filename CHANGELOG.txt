@@ -1,3 +1,6 @@
+2018-05-31
+* Introduced JQueryUI
+
 2018-05-30
  * Updated support for newer couchdb versions with basic authentication
  * Introduced support for enumerations via EnumerationClasses and drop-down boxes
