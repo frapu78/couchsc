@@ -20,7 +20,7 @@ import net.frapu.code.visualization.domainModel.Association;
 import net.frapu.code.visualization.domainModel.Attribute;
 import net.frapu.code.visualization.domainModel.DomainClass;
 import net.frapu.code.visualization.domainModel.DomainUtils;
-import net.frapu.couchsc.renderer.DefaultRenderer;
+import net.frapu.couchsc.renderer.DefaultHTMLRenderer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,15 +28,16 @@ import org.json.JSONObject;
 /**
  *
  * @author frank
+ *
  */
 public class DefaultHandler implements HttpHandler {
 
-    private DefaultRenderer renderer;
+    private DefaultHTMLRenderer renderer;
 
     public DefaultHandler() {
         // Get default renderer
         CouchSCServer cscs = CouchSCServer.getInstance();
-        renderer = new DefaultRenderer(cscs.getDomainModel());
+        renderer = new DefaultHTMLRenderer(cscs.getDomainModel());
     }
 
     public void handle(HttpExchange he) throws IOException {

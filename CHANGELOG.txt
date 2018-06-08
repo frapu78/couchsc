@@ -1,3 +1,6 @@
+Changelog for CouchSC
+=====================
+
 2018-05-31
 * Introduced JQueryUI
 
