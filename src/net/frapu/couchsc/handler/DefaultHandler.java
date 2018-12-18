@@ -288,6 +288,29 @@ public class DefaultHandler implements HttpHandler {
                 response += "<h2>500 - INTERNAL ERROR</h2>";
                 response += "<p>" + e + "</p>";
             }
+        } else if (requestUri.matches("/resources/.*")) {
+            //
+            // Check for resource file
+            //
+            try {
+                String requestedResource = requestUri.replace("/resources/", "");
+
+                responseCode = 200;
+                response = ResourceHandler.fetchTextResource(requestedResource);
+                he.getResponseHeaders().set("Content-Type", ResourceHandler.getContentType(requestedResource));
+                he.sendResponseHeaders(responseCode, response.length());
+                PrintWriter w = new PrintWriter(he.getResponseBody());
+                w.print(response);
+                w.close();
+
+            } catch (Exception e) {
+
+                System.out.println(e);
+
+                responseCode = 500;
+                response += "<h2>500 - INTERNAL ERROR</h2>";
+                response += "<p>" + e + "</p>";
+            }
         } else {
             responseCode = 404;
             response += "<h2>404 - NOT FOUND</h2>";
@@ -423,7 +446,7 @@ public class DefaultHandler implements HttpHandler {
         response = "<html><head><title>CouchSC Server</title>";
         // Include JQueryUI, see https://jqueryui.com
         response += "<link rel=\"stylesheet\" href=\"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css\">" +
-                    " <link rel=\"stylesheet\" href=\"/resources/demos/style.css\">" +
+                    " <link rel=\"stylesheet\" href=\"/resources/style.css\">" +
                     " <script src=\"https://code.jquery.com/jquery-1.12.4.js\"></script>" +
                     " <script src=\"https://code.jquery.com/ui/1.12.1/jquery-ui.js\"></script>";
         response += "<style>" +
