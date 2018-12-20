@@ -1,6 +1,10 @@
 Changelog for CouchSC
 =====================
 
+Todo
+* Check if association key in couchdb can be created with key = "source,target" and can be searched / sorted by target (endswidth)
+* Rename "type" in "_type" in couchdb(!)
+
 2018-12-20
 * Worked on Associations; view of different target types now supported
 
