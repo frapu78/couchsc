@@ -38,8 +38,11 @@ public class CouchSCServer {
     private DomainModel model;
     private InstanceConnector ic = null;
     private String couchDBVersion = "";
-    private static final int port = 2107;
+    private static final int PORT = 2107;
 
+    private static final int LIMIT = 20;
+
+    //private final URI modelLocation = URI.create(("http://goofy.local:1205/models/1943951744"));
     private final URI modelLocation = URI.create(("http://goofy.local:1205/models/1520138062"));
     // Credentials for CouchDB
     private final String couchDBUrl = "http://localhost:5984/";
@@ -222,7 +225,7 @@ public class CouchSCServer {
         System.out.println("OK");
 
         // Bind to all interfaces
-        InetSocketAddress address = new InetSocketAddress(port);
+        InetSocketAddress address = new InetSocketAddress(PORT);
         this.server = HttpServer.create(address, 255);
         // Add contexts
         server.createContext("/", new DefaultHandler());
@@ -239,6 +242,9 @@ public class CouchSCServer {
     public String getCouchDBVersion() {
         return couchDBVersion;
     }
+
+    // Returns the limit for each entry to show
+    public int getLimit() { return LIMIT;}
 
     public static CouchSCServer getInstance() {
         if (instance == null) {

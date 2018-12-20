@@ -1,6 +1,9 @@
 Changelog for CouchSC
 =====================
 
+2018-12-20
+* Worked on Associations; view of different target types now supported
+
 2018-12-18
 * Added first version of ResourceHandler
 

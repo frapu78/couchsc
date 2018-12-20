@@ -13,6 +13,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.List;
 import net.frapu.code.visualization.ProcessNode;
 import net.frapu.code.visualization.domainModel.Aggregation;
@@ -20,6 +21,8 @@ import net.frapu.code.visualization.domainModel.Association;
 import net.frapu.code.visualization.domainModel.Attribute;
 import net.frapu.code.visualization.domainModel.DomainClass;
 import net.frapu.code.visualization.domainModel.DomainUtils;
+import net.frapu.couchsc.data.AssociationResolution;
+import net.frapu.couchsc.helper.RenderHelper;
 import net.frapu.couchsc.renderer.DefaultHTMLRenderer;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -270,7 +273,7 @@ public class DefaultHandler implements HttpHandler {
                                 }
                             }
                             response += "</table></div>";
-                            response = renderAssociations(typeClass, cscs, response, assocs);
+                            response = renderAssociations(typeClass, cscs, response, doc.getString("_id"), assocs);
 
                             response += "<input class=\"ui-button ui-widget ui-corner-all\"  value=\"Update\" type=\"submit\"/>";
                             response += "<input class=\"ui-button ui-widget ui-corner-all\"  value=\"Cancel\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
@@ -335,10 +338,30 @@ public class DefaultHandler implements HttpHandler {
      * @return
      * @throws JSONException
      */
-    private String renderAssociations(DomainClass typeClass, CouchSCServer cscs, String response, JSONObject assocs) throws JSONException {
+    private String renderAssociations(DomainClass typeClass, CouchSCServer cscs, String response, String sourceId, JSONObject assocs) throws JSONException {
         // Get Associations
         List<Association> modelAssocs = DomainUtils.getAssociations(typeClass, cscs.getDomainModel());
         if (modelAssocs.size() > 0) {
+
+            // Fetch all outgoing associations and sort by target type
+            LinkedList<AssociationResolution> assocList = new LinkedList<>();
+            if (assocs.getInt("total_rows") > 0) {
+                JSONArray rows = assocs.getJSONArray("rows");
+                for (int pos = 0; pos < rows.length() && pos < CouchSCServer.getInstance().getLimit(); pos++) {
+                    JSONObject value = rows.getJSONObject(pos).getJSONObject("value");
+                    String targetId = value.getString("target");
+                    // Fetch targetId
+                    try {
+                        JSONObject doc = cscs.getInstanceConnector().getDocument(targetId);
+                        String targetType = doc.getString("type");
+                        assocList.push(new AssociationResolution(sourceId, targetId, targetType, doc));
+                    } catch (Exception e) {
+                        // Ignore for now, skip
+                    }
+                }
+                response += "</ul>";
+            }
+
             response += "<ul>";
             for (Association assEdge : modelAssocs) {
                 String edgeStyle = getEdgeStyle(assEdge);
@@ -347,25 +370,23 @@ public class DefaultHandler implements HttpHandler {
                     name = assEdge.getSource().getText() + edgeStyle + assEdge.getTarget().getText();
                 }
                 response += "<li>" + name;
-                response += "<img src=\"http://localhost:1205/pics/menu/plus_small.gif\" border=\"0\" align=\"bottom\"> ";
-                // Check if they are associations in... (preprocess by label)
-                if (assocs.getInt("total_rows") > 0) {
-                    JSONArray rows = assocs.getJSONArray("rows");
-                    // Dump all matching instances
+                response += "<img src=\"http://localhost:1205/pics/menu/plus_small.gif\" border=\"0\" align=\"bottom\"> create";
+                // Check if they are associations in... (preprocess by type)
+                for (AssociationResolution ar: assocList) {
                     response += "<ul>";
-                    for (int pos = 0; pos < rows.length(); pos++) {
-                        JSONObject value = rows.getJSONObject(pos).getJSONObject("value");
-                        /*if (value.getString("label").equals(name))*/ {
-                            response += "<li><a href=\"/data/" + value.getString("target") + "\">" + value.getString("target") + "</a></li>";
+                    List<DomainClass> parentClasses = DomainUtils.getChildren((DomainClass)assEdge.getTarget(), cscs.getDomainModel() );
+                    parentClasses.add((DomainClass)assEdge.getTarget());
+                    for (DomainClass dc: parentClasses) {
+                        if (ar.getTargetClass().equals(dc.getText())) {
+                            // Found something that belongs to this association class
+                            String targetKey = RenderHelper.resolveKey(dc, ar.getTargetDoc());
+                            response += "<li><a href=\"/data/" + ar.getTarget() + "\">" + targetKey+"</a> (edit)</li>";
+                            break;
                         }
-                        //                                            response += "<tr><td>" + value.getString("label");
-                        //                                            response += "</td><td>ASSOC</td><td><a href=\"/data/"
-                        //                                                    + value.getString("target") + "\">"
-                        //                                                    + value.getString("target")
-                        //                                                    + "</a></td></tr>";
                     }
                     response += "</ul>";
                 }
+
                 response += "</li>";
             }
             response += "</ul>";
@@ -399,8 +420,8 @@ public class DefaultHandler implements HttpHandler {
             response += "<ul>";
             // Fetch views
             try {
-                // Only fetch the first twenty results
-                JSONObject instances = cscs.getInstanceConnector().getView(InstanceConnector.normalize(agg.getTarget().getName()), 0, 20);
+                // Only fetch the first twenty (LIMIT) results
+                JSONObject instances = cscs.getInstanceConnector().getView(InstanceConnector.normalize(agg.getTarget().getName()), 0, CouchSCServer.getInstance().getLimit());
                 // Get the rows
                 JSONArray rows = instances.getJSONArray("rows");
                 for (int pos = 0; pos < rows.length(); pos++) {

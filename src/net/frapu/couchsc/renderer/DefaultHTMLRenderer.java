@@ -83,7 +83,7 @@ public class DefaultHTMLRenderer extends DefaultRenderer {
                     response += "<option "+(t.equalsIgnoreCase(value)?"selected='selected'":"")+" value='"+t+"'>"+t+"</option>";
                 }
                 response += "<select>";
-                if (!found) response += "<font color='#d00'> Old value '"+value+"' not supported anymore!</span>";
+                if (!found & doc != null) response += "<font color='#d00'> Old value '"+value+"' not supported anymore!</span>";
                 response += "</td</tr>";
                 return response;
             }
