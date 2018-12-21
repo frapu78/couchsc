@@ -298,13 +298,9 @@ public class DefaultHandler implements HttpHandler {
             try {
                 String requestedResource = requestUri.replace("/resources/", "");
 
-                responseCode = 200;
-                response = ResourceHandler.fetchTextResource(requestedResource);
-                he.getResponseHeaders().set("Content-Type", ResourceHandler.getContentType(requestedResource));
-                he.sendResponseHeaders(responseCode, response.length());
-                PrintWriter w = new PrintWriter(he.getResponseBody());
-                w.print(response);
-                w.close();
+                responseCode = ResourceHandler.fetchResource(requestedResource, he);
+                if (responseCode==200) return;
+                if (responseCode==404) response += "<h2>404 - NOT FOUND</h2>";
 
             } catch (Exception e) {
 
@@ -370,7 +366,7 @@ public class DefaultHandler implements HttpHandler {
                     name = assEdge.getSource().getText() + edgeStyle + assEdge.getTarget().getText();
                 }
                 response += "<li>" + name;
-                response += "<img src=\"http://localhost:1205/pics/menu/plus_small.gif\" border=\"0\" align=\"bottom\"> create";
+                response += "<img src=\"/resources/images/plus_small.gif\" border=\"0\" align=\"bottom\"> create";
                 // Check if they are associations in... (preprocess by type)
                 for (AssociationResolution ar: assocList) {
                     response += "<ul>";
@@ -406,7 +402,7 @@ public class DefaultHandler implements HttpHandler {
         List<Aggregation> rootAggs = DomainUtils.getAggregations(root_instance, cscs.getDomainModel());
         for (Aggregation agg : rootAggs) {
             response += "<li>" + agg.getSource().getName() + "<>--" + agg.getTarget().getName();
-            response += "<img src=\"http://localhost:1205/pics/menu/plus_small.gif\" border=\"0\" align=\"bottom\"> ";
+            response += "<img src=\"/resources/images/plus_small.gif\" border=\"0\" align=\"bottom\"> ";
             // List other types here (if existing)
             List<DomainClass> dcs = DomainUtils.getChildren((DomainClass) agg.getTarget(), cscs.getDomainModel());
             if (dcs.size() > 0) {
@@ -466,10 +462,10 @@ public class DefaultHandler implements HttpHandler {
         // HEADER
         response = "<html><head><title>CouchSC Server</title>";
         // Include JQueryUI, see https://jqueryui.com
-        response += "<link rel=\"stylesheet\" href=\"//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css\">" +
+        response += "<link rel=\"stylesheet\" href=\"/resources/jquery-ui.css\">" +
                     " <link rel=\"stylesheet\" href=\"/resources/style.css\">" +
-                    " <script src=\"https://code.jquery.com/jquery-1.12.4.js\"></script>" +
-                    " <script src=\"https://code.jquery.com/ui/1.12.1/jquery-ui.js\"></script>";
+                    " <script src=\"/resources/jquery-1.12.4.js\"></script>" +
+                    " <script src=\"/resources/jquery-ui.js\"></script>";
         response += "<style>" +
                     "    label, input { display:block; }" +
                     "    input.text { margin-bottom:12px; width:95%; padding: .4em; }" +

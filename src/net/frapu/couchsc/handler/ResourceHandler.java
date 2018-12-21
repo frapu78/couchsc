@@ -7,7 +7,12 @@
  */
 package net.frapu.couchsc.handler;
 
+import com.sun.net.httpserver.HttpExchange;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ResourceHandler {
 
@@ -22,6 +27,7 @@ public class ResourceHandler {
         if (name.endsWith(".css")) return "text/css";
         if (name.endsWith(".js")) return "application/javascript";
         if (name.endsWith(".jpg") | (name.endsWith(".jpeg"))) return "image/jpeg";
+        if (name.endsWith(".gif")) return "image/gif";
         // Default
         return "text/plain";
     }
@@ -32,21 +38,23 @@ public class ResourceHandler {
      * @return
      * @throws Exception
      */
-    public static String fetchTextResource(String name) throws Exception {
-        System.out.println("FETCHING RESOURCE "+name);
+    public static int fetchResource(String name, HttpExchange he) throws Exception {
         // @todo Refactor so that resources are loaded from the file system and JARs
-        String result = "";
+        System.out.println("FETCHING RESOURCE "+name);
+        String pathName = RESOURCE_FOLDER+name;
+        File f = new File(pathName);
+        if (!f.exists()) return 404; // File not found
 
-        File f = new File(RESOURCE_FOLDER+name);
-        InputStreamReader r = new FileReader(f);
-        BufferedReader br = new BufferedReader(r);
-        while (br.ready()) {
-            result += br.readLine();
-        }
-        br.close();
-        r.close();
+        Path path = Paths.get(pathName);
+        byte[] bytes = Files.readAllBytes(path);
 
-        return result;
+        he.getResponseHeaders().set("Content-Type", ResourceHandler.getContentType(name));
+        he.sendResponseHeaders(200, bytes.length);
+        BufferedOutputStream bos = new BufferedOutputStream(he.getResponseBody());
+        bos.write(bytes);
+        bos.close();
+
+        return 200;
     }
 
 }
