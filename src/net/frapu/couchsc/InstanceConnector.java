@@ -77,8 +77,15 @@ public class InstanceConnector {
     }
 
     public JSONObject getView(String viewname, int start, int limit) throws
-            IOException, ParserConfigurationException, JSONException {
-        URI uri = URI.create(server + dbName+"/_design/view_"+dbName+"/_view/"+viewname);
+            IOException, ParserConfigurationException, JSONException, URISyntaxException {
+        URI serverUri = URI.create(server);
+        URI uri = new URI(serverUri.getScheme(),
+                serverUri.getUserInfo(),
+                serverUri.getHost(),
+                serverUri.getPort(),
+                "/"+dbName+"/_design/view_"+dbName+"/_view/"+viewname,
+                "limit="+limit+"&skip="+start,
+                null );
         JSONHttpRequest req = new JSONHttpRequest(uri);
         req.setRequestProperty("Authorization", credentials);
         return req.executeGetRequest();
@@ -91,7 +98,9 @@ public class InstanceConnector {
                 serverUri.getUserInfo(),
                 serverUri.getHost(),
                 serverUri.getPort(),
-                "/"+dbName+"/_design/assoc_"+dbName+"/_view/AssociationsFrom","key=\""+docname+"\"",
+                "/"+dbName+"/_design/assoc_"+dbName+"/_view/AssociationsFrom",
+                "key=\""+docname+"\"&limit="+
+                limit+"&skip="+start,
                 null );
         JSONHttpRequest req = new JSONHttpRequest(uri);
         req.setRequestProperty("Authorization", credentials);

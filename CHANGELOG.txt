@@ -5,6 +5,10 @@ Todo
 * Check if association key in couchdb can be created with key = "source,target" and can be searched / sorted by target (endswidth)
 * Rename "type" in "_type" in couchdb(!)
 
+2018-12-27
+* Worked on InstanceConnector to support limits, keyed searches
+* Reworked domain model to contain abstract "Person" class, added "Kunde", Added Mitarbeiter aggregates Mitarbeiter ("chef_von")
+
 2018-12-21
 * Added JQuery resources and image resources to local folder
 * Added support for binary files

@@ -40,10 +40,10 @@ public class CouchSCServer {
     private String couchDBVersion = "";
     private static final int PORT = 2107;
 
-    private static final int LIMIT = 20;
+    private static final int LIMIT = 10;
 
     //private final URI modelLocation = URI.create(("http://goofy.local:1205/models/1943951744"));
-    private final URI modelLocation = URI.create(("http://localhost:1205/models/1033709973"));
+    private final URI modelLocation = URI.create(("http://localhost:1205/models/1520138062"));
     // Credentials for CouchDB
     private final String couchDBUrl = "http://localhost:5984/";
     private final String couchDBCredentials = CouchDBHelper.getBasicAuthString("admin", "admin");

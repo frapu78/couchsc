@@ -376,7 +376,7 @@ public class DefaultHandler implements HttpHandler {
                         if (ar.getTargetClass().equals(dc.getText())) {
                             // Found something that belongs to this association class
                             String targetKey = RenderHelper.resolveKey(dc, ar.getTargetDoc());
-                            response += "<li><a href=\"/data/" + ar.getTarget() + "\">" + targetKey+"</a> (edit)</li>";
+                            response += "<li><a href=\"/data/" + ar.getTarget() + "\">" + targetKey+"</a> (delete)</li>";
                             break;
                         }
                     }
@@ -418,6 +418,8 @@ public class DefaultHandler implements HttpHandler {
             try {
                 // Only fetch the first twenty (LIMIT) results
                 JSONObject instances = cscs.getInstanceConnector().getView(InstanceConnector.normalize(agg.getTarget().getName()), 0, CouchSCServer.getInstance().getLimit());
+                // Get count
+                int countLeft = instances.getInt("total_rows") - instances.getInt("offset");
                 // Get the rows
                 JSONArray rows = instances.getJSONArray("rows");
                 for (int pos = 0; pos < rows.length(); pos++) {
@@ -425,6 +427,9 @@ public class DefaultHandler implements HttpHandler {
                     String id = row.getString("id");
                     String key = row.getString("key");
                     response += "<li><a href=\"/data/" + id + "\">" + key + "</a></li>";
+                }
+                if (countLeft>cscs.getLimit()) {
+                    response += "<li>... ("+(countLeft-cscs.getLimit())+" more)</li>";
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
