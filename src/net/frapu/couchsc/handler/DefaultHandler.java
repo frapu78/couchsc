@@ -13,8 +13,11 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import net.frapu.code.visualization.ProcessNode;
 import net.frapu.code.visualization.domainModel.Aggregation;
 import net.frapu.code.visualization.domainModel.Association;
@@ -24,6 +27,8 @@ import net.frapu.code.visualization.domainModel.DomainUtils;
 import net.frapu.couchsc.data.AssociationResolution;
 import net.frapu.couchsc.helper.RenderHelper;
 import net.frapu.couchsc.renderer.DefaultHTMLRenderer;
+import net.frapu.couchsc.renderer.DefaultJSONRenderer;
+import net.frapu.couchsc.renderer.DefaultRenderer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,12 +40,17 @@ import org.json.JSONObject;
  */
 public class DefaultHandler implements HttpHandler {
 
-    private DefaultHTMLRenderer renderer;
+    private Map<String, DefaultRenderer> renderer = new HashMap<>();
 
     public DefaultHandler() {
         // Get default renderer
         CouchSCServer cscs = CouchSCServer.getInstance();
-        renderer = new DefaultHTMLRenderer(cscs.getDomainModel());
+        // Add HTML renderer
+        DefaultRenderer htmlRenderer = new DefaultHTMLRenderer(cscs.getDomainModel());
+        renderer.put(htmlRenderer.getSupportedContentType(), htmlRenderer);
+        // Add JSON renderer
+        DefaultRenderer jsonRenderer = new DefaultJSONRenderer(cscs.getDomainModel());
+        renderer.put(jsonRenderer.getSupportedContentType(), jsonRenderer);
     }
 
     public void handle(HttpExchange he) throws IOException {
@@ -100,7 +110,7 @@ public class DefaultHandler implements HttpHandler {
                 try {
                     // Create new document in db
                     JSONObject doc = new JSONObject();
-                    doc.put("type", requestedType);
+                    doc.put(CouchSCServer.TYPE_INDICATOR, requestedType);
                     for (MultiPartItem item : mpo.getItems()) {
                         if (item.getDispositionAttribute("name") != null) {
                             doc.put(item.getDispositionAttribute("name"),
@@ -129,11 +139,11 @@ public class DefaultHandler implements HttpHandler {
             try {
                 // 1: Fetch recent document
                 JSONObject doc = cscs.getInstanceConnector().getDocument(requestedId);
-                if (!doc.has("type")) {
+                if (!doc.has(CouchSCServer.TYPE_INDICATOR)) {
                     responseCode = 404;
                     response += "<h2>404 - TYPE NOT FOUND IN DOCUMENT</h2>";
                 } else {
-                    String requestedType = doc.getString("type");
+                    String requestedType = doc.getString(CouchSCServer.TYPE_INDICATOR);
                     DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
                     if (typeClass == null) {
                         responseCode = 404;
@@ -219,7 +229,8 @@ public class DefaultHandler implements HttpHandler {
                         List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
                         for (DomainClass dc : dcs) {
                             for (Attribute a : dc.getAttributesByIDs().values()) {
-                                response += renderer.renderAttribute(a, null);
+                                //@todo Refactor hack for renderer(!)
+                                response += ((DefaultHTMLRenderer)renderer.get("html")).renderAttribute(a, null);
                             }
                         }
                         response += "</table></div>";
@@ -251,9 +262,9 @@ public class DefaultHandler implements HttpHandler {
                     }
                 } else {
                     // Get type
-                    if (doc.has("type")) {
+                    if (doc.has(CouchSCServer.TYPE_INDICATOR)) {
                         // No error, process
-                        String requestedType = doc.getString("type");
+                        String requestedType = doc.getString(CouchSCServer.TYPE_INDICATOR);
                         DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
                         if (typeClass == null) {
                             responseCode = 404;
@@ -269,7 +280,8 @@ public class DefaultHandler implements HttpHandler {
                             List<DomainClass> dcs = DomainUtils.getParents(typeClass, cscs.getDomainModel());
                             for (DomainClass dc : dcs) {
                                 for (Attribute a : dc.getAttributesByIDs().values()) {
-                                    response += renderer.renderAttribute(a, doc);
+                                    //@todo Refactor hack for renderer(!)
+                                    response += ((DefaultHTMLRenderer)renderer.get("html")).renderAttribute(a, doc);
                                 }
                             }
                             response += "</table></div>";
@@ -310,10 +322,27 @@ public class DefaultHandler implements HttpHandler {
                 response += "<h2>500 - INTERNAL ERROR</h2>";
                 response += "<p>" + e + "</p>";
             }
+        } else if (requestUri.matches("/search/.*")) {
+            //
+            // Check for search
+            //
+            try {
+                // Do nothing yet
+                response+="Search Picker...";
+
+            } catch (Exception e) {
+
+                System.out.println(e);
+
+                responseCode = 500;
+                response += "<h2>500 - INTERNAL ERROR</h2>";
+                response += "<p>" + e + "</p>";
+            }
         } else {
-            responseCode = 404;
-            response += "<h2>404 - NOT FOUND</h2>";
-        }
+                responseCode = 404;
+                response += "<h2>404 - NOT FOUND</h2>";
+            }
+
         response = renderFooter(response);
 
         // Send response
@@ -349,7 +378,7 @@ public class DefaultHandler implements HttpHandler {
                     // Fetch targetId
                     try {
                         JSONObject doc = cscs.getInstanceConnector().getDocument(targetId);
-                        String targetType = doc.getString("type");
+                        String targetType = doc.getString(CouchSCServer.TYPE_INDICATOR);
                         assocList.push(new AssociationResolution(sourceId, targetId, targetType, doc));
                     } catch (Exception e) {
                         // Ignore for now, skip

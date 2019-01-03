@@ -6,7 +6,6 @@ package net.frapu.couchsc.renderer;
 import net.frapu.code.visualization.ProcessModel;
 import net.frapu.code.visualization.ProcessNode;
 import net.frapu.code.visualization.domainModel.Attribute;
-import net.frapu.code.visualization.domainModel.DomainUtils;
 import net.frapu.code.visualization.domainModel.EnumerationClass;
 import net.frapu.couchsc.InstanceConnector;
 import org.json.JSONException;
@@ -19,27 +18,13 @@ import java.util.List;
  */
 public class DefaultHTMLRenderer extends DefaultRenderer {
 
-    private ProcessModel recentModel;
+    public DefaultHTMLRenderer(ProcessModel recentModel) {
+        super(recentModel);
+    }
 
     @Override
     public String getSupportedContentType() {
         return "html";
-    }
-
-    /**
-     * Creates a new instance of the Default HTML Renderer with a specific ProcessModel.
-     * @param model
-     */
-    public DefaultHTMLRenderer(ProcessModel model) {
-        this.recentModel = model;
-    }
-
-    public ProcessModel getRecentModel() {
-        return recentModel;
-    }
-
-    public void setRecentModel(ProcessModel recentModel) {
-        this.recentModel = recentModel;
     }
 
     /**

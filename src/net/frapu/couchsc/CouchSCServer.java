@@ -50,6 +50,9 @@ public class CouchSCServer {
     // Credentials for ProcessEditorServer
     private final UserCredentials modelUserCredentials = new UserCredentials("http://localhost:1205", "root", "inubit");
 
+    public static final String INDICATOR = "$";
+    public static final String TYPE_INDICATOR = INDICATOR+"type";
+
     public CouchSCServer() throws Exception {
     }
 
@@ -93,7 +96,7 @@ public class CouchSCServer {
                 JSONObject map = new JSONObject();
                 Association assoc = (Association)edge;
                 String function = "function(doc) {";
-                function += "if( doc.type==\"Association\") {";
+                function += "if( doc."+TYPE_INDICATOR+"==\"Association\") {";
                 function += "emit( doc.source, doc); ";
                 function += "}}";
                 map.put("map", function);
@@ -128,7 +131,7 @@ public class CouchSCServer {
                 // Iterate over all child classes, too
                 int size = DomainUtils.getChildren(dc, model).size();
                 for (DomainClass dc1 : DomainUtils.getChildren(dc, model)) {
-                    function += "doc.type==\"" + InstanceConnector.normalize(dc1.getName()) + "\"";
+                    function += "doc."+TYPE_INDICATOR+"==\"" + InstanceConnector.normalize(dc1.getName()) + "\"";
                     if ((size--) > 1) {
                         function += "|";
                     }
