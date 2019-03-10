@@ -1,24 +1,18 @@
 package net.frapu.couchsc.renderer;
 
 import net.frapu.code.visualization.ProcessModel;
+import net.frapu.couchsc.CouchSCServer;
 
 /*
  * This class implements an abstract Renderer class.
  */
 public abstract class DefaultRenderer {
 
-    protected ProcessModel recentModel;
+    protected CouchSCServer cscs;
 
-    public DefaultRenderer(ProcessModel recentModel) {
-        this.recentModel = recentModel;
-    }
 
-    public ProcessModel getRecentModel() {
-        return recentModel;
-    }
-
-    public void setRecentModel(ProcessModel recentModel) {
-        this.recentModel = recentModel;
+    public DefaultRenderer(CouchSCServer cscs) {
+        this.cscs = cscs;
     }
 
     /**
@@ -26,7 +20,5 @@ public abstract class DefaultRenderer {
      * @return
      */
     public abstract String getSupportedContentType();
-
-
 
 }

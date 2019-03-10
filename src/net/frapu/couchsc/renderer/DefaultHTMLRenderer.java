@@ -7,6 +7,7 @@ import net.frapu.code.visualization.ProcessModel;
 import net.frapu.code.visualization.ProcessNode;
 import net.frapu.code.visualization.domainModel.Attribute;
 import net.frapu.code.visualization.domainModel.EnumerationClass;
+import net.frapu.couchsc.CouchSCServer;
 import net.frapu.couchsc.InstanceConnector;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +19,8 @@ import java.util.List;
  */
 public class DefaultHTMLRenderer extends DefaultRenderer {
 
-    public DefaultHTMLRenderer(ProcessModel recentModel) {
-        super(recentModel);
+    public DefaultHTMLRenderer(CouchSCServer cscs) {
+        super(cscs);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class DefaultHTMLRenderer extends DefaultRenderer {
             value = doc.getString(a.getName());
             }
         // Check different types, start with a check if the type is an enumeration in the model
-        List<ProcessNode> enums = recentModel.getNodesByClass(EnumerationClass.class);
+        List<ProcessNode> enums = cscs.getDomainModel().getNodesByClass(EnumerationClass.class);
 
         //
         // Check for Enumeration

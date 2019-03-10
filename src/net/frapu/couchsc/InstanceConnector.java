@@ -76,7 +76,7 @@ public class InstanceConnector {
         return result;
     }
 
-    public JSONObject getView(String viewname, int start, int limit) throws
+    public JSONObject getViewWithFilter(String viewname, int start, int limit, String startKey) throws
             IOException, ParserConfigurationException, JSONException, URISyntaxException {
         URI serverUri = URI.create(server);
         URI uri = new URI(serverUri.getScheme(),
@@ -84,11 +84,16 @@ public class InstanceConnector {
                 serverUri.getHost(),
                 serverUri.getPort(),
                 "/"+dbName+"/_design/view_"+dbName+"/_view/"+viewname,
-                "limit="+limit+"&skip="+start,
+                "limit="+limit+"&skip="+start+"&startkey=\""+startKey+"\"",
                 null );
         JSONHttpRequest req = new JSONHttpRequest(uri);
         req.setRequestProperty("Authorization", credentials);
         return req.executeGetRequest();
+    }
+
+    public JSONObject getView(String viewname, int start, int limit) throws
+            IOException, ParserConfigurationException, JSONException, URISyntaxException {
+        return getViewWithFilter(viewname, start, limit, "");
     }
 
     public JSONObject getAssociationsFromDocument(String docname, int start, int limit) throws

@@ -46,24 +46,24 @@ public class DefaultHandler implements HttpHandler {
         // Get default renderer
         CouchSCServer cscs = CouchSCServer.getInstance();
         // Add HTML renderer
-        DefaultRenderer htmlRenderer = new DefaultHTMLRenderer(cscs.getDomainModel());
+        DefaultRenderer htmlRenderer = new DefaultHTMLRenderer(cscs);
         renderer.put(htmlRenderer.getSupportedContentType(), htmlRenderer);
         // Add JSON renderer
-        DefaultRenderer jsonRenderer = new DefaultJSONRenderer(cscs.getDomainModel());
+        DefaultRenderer jsonRenderer = new DefaultJSONRenderer(cscs);
         renderer.put(jsonRenderer.getSupportedContentType(), jsonRenderer);
     }
 
     public void handle(HttpExchange he) throws IOException {
 
-        if (he.getRequestMethod().equalsIgnoreCase("GET")) {
+        if (he.getRequestMethod().equalsIgnoreCase(HTTPConstants.HTTP_GET)) {
             handleGetRequest(he);
         }
 
-        if (he.getRequestMethod().equalsIgnoreCase("POST")) {
+        if (he.getRequestMethod().equalsIgnoreCase(HTTPConstants.HTTP_POST)) {
             handlePostRequest(he);
         }
 
-        if (he.getRequestMethod().equalsIgnoreCase("PUT")) {
+        if (he.getRequestMethod().equalsIgnoreCase(HTTPConstants.HTTP_PUT)) {
             handlePutRequest(he);
         }
     }
@@ -75,7 +75,7 @@ public class DefaultHandler implements HttpHandler {
         String requestUri = he.getRequestURI().toASCIIString();
         String response = "";
         response = renderHeader(response, cscs);
-        int responseCode = 200;
+        int responseCode = HTTPConstants.HTTP_OK;
 
         SimpleMultipartParser smp = new SimpleMultipartParser();
         MultiPartObject mpo = smp.parseSource(he.getRequestBody());
@@ -94,7 +94,7 @@ public class DefaultHandler implements HttpHandler {
         String requestUri = he.getRequestURI().toASCIIString();
         String response = "";
         response = renderHeader(response, cscs);
-        int responseCode = 201;
+        int responseCode = HTTPConstants.HTTP_OK_NO_CONTENT;
 
         SimpleMultipartParser smp = new SimpleMultipartParser();
         MultiPartObject mpo = smp.parseSource(he.getRequestBody());
@@ -104,7 +104,7 @@ public class DefaultHandler implements HttpHandler {
             String requestedType = requestUri.replace("/types/", "");
             DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
             if (typeClass == null) {
-                responseCode = 404;
+                responseCode = HTTPConstants.HTTP_NOT_FOUND;
                 response += "<h2>404 - NOT FOUND</h2>";
             } else {
                 try {
@@ -122,13 +122,13 @@ public class DefaultHandler implements HttpHandler {
                     if (result.getBoolean("ok")) {
                         response += "<p>Created with instance id: " + result.getString("id") + "</p>";
                     } else {
-                        responseCode = 500;
+                        responseCode = HTTPConstants.HTTP_ERROR;
                         response += "<p>" + result.toString() + "</p>";
                     }
                     response += "<input class=\"button\" value=\"Ok\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
                 } catch (Exception e) {
                     // Show error
-                    responseCode = 500;
+                    responseCode = HTTPConstants.HTTP_ERROR;
                     response += "<h2>500 - DB SERVER ERROR</h2>";
                     response += "<p>" + e.getMessage() + "</p>";
                 }
@@ -140,13 +140,13 @@ public class DefaultHandler implements HttpHandler {
                 // 1: Fetch recent document
                 JSONObject doc = cscs.getInstanceConnector().getDocument(requestedId);
                 if (!doc.has(CouchSCServer.TYPE_INDICATOR)) {
-                    responseCode = 404;
+                    responseCode = HTTPConstants.HTTP_NOT_FOUND;
                     response += "<h2>404 - TYPE NOT FOUND IN DOCUMENT</h2>";
                 } else {
                     String requestedType = doc.getString(CouchSCServer.TYPE_INDICATOR);
                     DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
                     if (typeClass == null) {
-                        responseCode = 404;
+                        responseCode = HTTPConstants.HTTP_NOT_FOUND;
                         response += "<h2>404 - TYPE NOT FOUND IN DOMAIN MODEL</h2>";
                     } else {
                         // 2: Merge received fields that comply to recent type
@@ -163,7 +163,7 @@ public class DefaultHandler implements HttpHandler {
                         if (result.getBoolean("ok")) {
                             response += "<p>Updated with instance id: " + result.getString("id") + "</p>";
                         } else {
-                            responseCode = 500;
+                            responseCode = HTTPConstants.HTTP_ERROR;
                             response += "<p>" + result.toString() + "</p>";
                         }
                         response += "<input class=\"button\" value=\"Ok\" type=\"button\" onClick=\"javascript:window.location='/'\"/>";
@@ -172,7 +172,7 @@ public class DefaultHandler implements HttpHandler {
 
             } catch (Exception e) {
                 // Show error
-                responseCode = 500;
+                responseCode = HTTPConstants.HTTP_ERROR;
                 response += "<h2>500 - SERVER ERROR</h2>";
                 response += "<p>" + e.getMessage() + "</p>";
             }
@@ -190,9 +190,17 @@ public class DefaultHandler implements HttpHandler {
         CouchSCServer cscs = CouchSCServer.getInstance();
         String requestUri = he.getRequestURI().toASCIIString();
 
+        String contentType = HTTPConstants.CONTENT_TYPE_HTML; // Default content type
+        if (he.getRequestHeaders().containsKey(HTTPConstants.HEADER_ACCEPT)) {
+            contentType = he.getRequestHeaders().getFirst(HTTPConstants.HEADER_ACCEPT);
+            //System.out.println("Found content type: "+contentType);
+        }
+
         String response = "";
-        response = renderHeader(response, cscs);
-        int responseCode = 200;
+        if (contentType.contains(HTTPConstants.CONTENT_TYPE_HTML)) {
+            response = renderHeader(response, cscs);
+        }
+        int responseCode = HTTPConstants.HTTP_OK;
 
         // Parse URI here
         if (requestUri.matches("/")) {
@@ -212,11 +220,11 @@ public class DefaultHandler implements HttpHandler {
             String requestedType = requestUri.replace("/types/", "");
             DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
             if (typeClass == null) {
-                responseCode = 404;
+                responseCode = HTTPConstants.HTTP_NOT_FOUND;
                 response += "<h2>404 - TYPE NOT FOUND IN DOMAIN MODEL</h2>";
             } else {
                 if (typeClass.getProperty(DomainClass.PROP_ABSTRACT).equals(DomainClass.TRUE)) {
-                    responseCode = 404;
+                    responseCode = HTTPConstants.HTTP_NOT_FOUND;
                     response += "<h2>404 - ABSTRACT TYPE CANNOT BE INSTANTIATED</h2>";
                 } else {
                     try {
@@ -253,10 +261,10 @@ public class DefaultHandler implements HttpHandler {
                 if (doc.has("error")) {
                     String error = doc.getString("error");
                     if (error.equals("not_found")) {
-                        responseCode = 404;
+                        responseCode = HTTPConstants.HTTP_NOT_FOUND;
                         response += "<h2>404 - NOT FOUND</h2>";
                     } else {
-                        responseCode = 500;
+                        responseCode = HTTPConstants.HTTP_ERROR;
                         response += "<h2>500 - DB ERROR</h2>";
                         response += "<p>" + error + ":" + doc.getString("reason") + "</p>";
                     }
@@ -267,7 +275,7 @@ public class DefaultHandler implements HttpHandler {
                         String requestedType = doc.getString(CouchSCServer.TYPE_INDICATOR);
                         DomainClass typeClass = getDomainClassFromURI(cscs, requestedType);
                         if (typeClass == null) {
-                            responseCode = 404;
+                            responseCode = HTTPConstants.HTTP_NOT_FOUND;
                             response += "<h2>404 - TYPE NOT FOUND IN DOMAIN MODEL</h2>";
                         } else {
                             // Render values here...
@@ -293,13 +301,13 @@ public class DefaultHandler implements HttpHandler {
                         }
                     } else {
                         // No type found
-                        responseCode = 500;
+                        responseCode = HTTPConstants.HTTP_ERROR;
                         response += "<h2>500 - THE REQUESTED DOCUMENT HAS NO TYPE</h2>";
                         response += "<p>" + doc + "</p>";
                     }
                 }
             } catch (Exception e) {
-                responseCode = 500;
+                responseCode = HTTPConstants.HTTP_ERROR;
                 response += "<h2>500 - INTERNAL ERROR</h2>";
                 response += "<p>" + e + "</p>";
             }
@@ -311,39 +319,47 @@ public class DefaultHandler implements HttpHandler {
                 String requestedResource = requestUri.replace("/resources/", "");
 
                 responseCode = ResourceHandler.fetchResource(requestedResource, he);
-                if (responseCode==200) return;
-                if (responseCode==404) response += "<h2>404 - NOT FOUND</h2>";
+                if (responseCode==HTTPConstants.HTTP_OK) return;
+                if (responseCode==HTTPConstants.HTTP_NOT_FOUND) response += "<h2>404 - NOT FOUND</h2>";
 
             } catch (Exception e) {
 
                 System.out.println(e);
 
-                responseCode = 500;
+                responseCode = HTTPConstants.HTTP_ERROR;
                 response += "<h2>500 - INTERNAL ERROR</h2>";
                 response += "<p>" + e + "</p>";
             }
         } else if (requestUri.matches("/search/.*")) {
             //
-            // Check for search
+            // Check for search content type: application/json or text/html(!)
             //
             try {
-                // Do nothing yet
-                response+="Search Picker...";
+                if (contentType.contains("application/json")) {
+                    // Create search response as json
+                    DefaultJSONRenderer jsonRenderer = (DefaultJSONRenderer)renderer.get("application/json");
+                    response = jsonRenderer.search(requestUri);
 
+                } else {
+                    // Handle search page
+                    response+="Search Picker...";
+                }
             } catch (Exception e) {
 
                 System.out.println(e);
 
-                responseCode = 500;
+                responseCode = HTTPConstants.HTTP_ERROR;
                 response += "<h2>500 - INTERNAL ERROR</h2>";
                 response += "<p>" + e + "</p>";
             }
         } else {
-                responseCode = 404;
+                responseCode = HTTPConstants.HTTP_NOT_FOUND;
                 response += "<h2>404 - NOT FOUND</h2>";
             }
 
-        response = renderFooter(response);
+        if (contentType.contains(HTTPConstants.CONTENT_TYPE_HTML)) {
+            response = renderFooter(response);
+        }
 
         // Send response
         he.sendResponseHeaders(responseCode, response.length());

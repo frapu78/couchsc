@@ -7,6 +7,8 @@
  */
 package net.frapu.couchsc.handler;
 
+import com.inubit.research.server.HttpConstants;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.*;
@@ -24,12 +26,12 @@ public class ResourceHandler {
      * @return
      */
     public final static String getContentType(String name) {
-        if (name.endsWith(".css")) return "text/css";
-        if (name.endsWith(".js")) return "application/javascript";
-        if (name.endsWith(".jpg") | (name.endsWith(".jpeg"))) return "image/jpeg";
-        if (name.endsWith(".gif")) return "image/gif";
+        if (name.endsWith(".css")) return HTTPConstants.CONTENT_TYPE_CSS;
+        if (name.endsWith(".js")) return HTTPConstants.CONTENT_TYPE_JS;
+        if (name.endsWith(".jpg") | (name.endsWith(".jpeg"))) return HTTPConstants.CONTENT_TYPE_JPG;
+        if (name.endsWith(".gif")) return HTTPConstants.CONTENT_TYPE_GIF;
         // Default
-        return "text/plain";
+        return HTTPConstants.CONTENT_TYPE_TEXT;
     }
 
     /**
@@ -43,18 +45,18 @@ public class ResourceHandler {
         System.out.println("FETCHING RESOURCE "+name);
         String pathName = RESOURCE_FOLDER+name;
         File f = new File(pathName);
-        if (!f.exists()) return 404; // File not found
+        if (!f.exists()) return HTTPConstants.HTTP_NOT_FOUND; // File not found
 
         Path path = Paths.get(pathName);
         byte[] bytes = Files.readAllBytes(path);
 
-        he.getResponseHeaders().set("Content-Type", ResourceHandler.getContentType(name));
-        he.sendResponseHeaders(200, bytes.length);
+        he.getResponseHeaders().set(HTTPConstants.HEADER_CONTENT_TYPE, ResourceHandler.getContentType(name));
+        he.sendResponseHeaders(HTTPConstants.HTTP_OK, bytes.length);
         BufferedOutputStream bos = new BufferedOutputStream(he.getResponseBody());
         bos.write(bytes);
         bos.close();
 
-        return 200;
+        return HTTPConstants.HTTP_OK;
     }
 
 }

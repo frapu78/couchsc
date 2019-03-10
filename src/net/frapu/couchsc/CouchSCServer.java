@@ -42,13 +42,12 @@ public class CouchSCServer {
 
     private static final int LIMIT = 10;
 
-    //private final URI modelLocation = URI.create(("http://goofy.local:1205/models/1943951744"));
-    private final URI modelLocation = URI.create(("http://localhost:1205/models/1520138062"));
+    private final URI modelLocation = URI.create(("http://127.0.0.1:1205/models/1520138062"));
     // Credentials for CouchDB
     private final String couchDBUrl = "http://localhost:5984/";
     private final String couchDBCredentials = CouchDBHelper.getBasicAuthString("admin", "admin");
     // Credentials for ProcessEditorServer
-    private final UserCredentials modelUserCredentials = new UserCredentials("http://localhost:1205", "root", "inubit");
+    private final UserCredentials modelUserCredentials = new UserCredentials("http://127.0.0.1:1205", "root", "inubit");
 
     public static final String INDICATOR = "$";
     public static final String TYPE_INDICATOR = INDICATOR+"type";
